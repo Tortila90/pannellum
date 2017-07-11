@@ -116,7 +116,7 @@ function Renderer(container) {
             // Enable WebGL on canvas
             if (!gl)
                 gl = canvas.getContext('experimental-webgl', {alpha: false, depth: false});
-            if (gl.getError() == 1286)
+            if (gl && gl.getError() == 1286)
                 handleWebGLError1286();
         }
         
@@ -458,6 +458,15 @@ function Renderer(container) {
     };
     // Initialize canvas size
     this.resize();
+
+    /**
+     * Set renderer horizon pitch and roll.
+     * @memberof Renderer
+     * @instance
+     */
+    this.setPose = function(horizonPitch, horizonRoll) {
+        pose = [horizonPitch, horizonRoll];
+    };
 
     /**
      * Render new view of panorama.

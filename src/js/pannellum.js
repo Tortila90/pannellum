@@ -704,8 +704,10 @@ function mouseEventToCoords(event) {
     var root = Math.sqrt(x*x + a*a);
     var pitch = Math.atan((y * c + focal * s) / root) * 180 / Math.PI;
     var yaw = Math.atan2(x / root, a / root) * 180 / Math.PI + config.yaw;
-    if (yaw < -180) yaw += 360;
-    if (yaw > 180) yaw -= 360;
+    if (yaw < -180)
+        yaw += 360;
+    if (yaw > 180)
+        yaw -= 360;
     return [pitch, yaw];
 }
 
@@ -1252,7 +1254,7 @@ function animateMove(axis) {
     var result = t.startPosition + config.animationTimingFunction(normTime) * (t.endPosition - t.startPosition);
     if ((t.endPosition > t.startPosition && result >= t.endPosition) ||
         (t.endPosition < t.startPosition && result <= t.endPosition) ||
-		t.endPosition === t.startPosition) {
+        t.endPosition === t.startPosition) {
         result = t.endPosition;
         speed[axis] = 0;
         var callback = animatedMove[axis].callback,
@@ -2130,7 +2132,7 @@ function loadScene(sceneId, targetPitch, targetYaw, targetHfov, fadeDone) {
     if (targetYaw === 'same') {
         workingYaw = config.yaw;
     } else if (targetYaw === 'sameAzimuth') {
-        workingYaw = config.yaw + config.northOffset - initialConfig.scenes[sceneId].northOffset;
+        workingYaw = config.yaw + (config.northOffset || 0) - (initialConfig.scenes[sceneId].northOffset || 0);
     } else {
         workingYaw = targetYaw;
     }
@@ -2444,6 +2446,54 @@ this.getNorthOffset = function() {
  */
 this.setNorthOffset = function(heading) {
     config.northOffset = Math.min(360, Math.max(0, heading));
+    animateInit();
+    return this;
+};
+
+/**
+ * Returns the panorama's horizon roll.
+ * @memberof Viewer
+ * @instance
+ * @returns {number} Horizon roll in degrees
+ */
+this.getHorizonRoll = function() {
+    return config.horizonRoll;
+};
+
+/**
+ * Sets the panorama's horizon roll.
+ * @memberof Viewer
+ * @instance
+ * @param {number} roll - Horizon roll in degrees [-90, 90]
+ * @returns {Viewer} `this`
+ */
+this.setHorizonRoll = function(roll) {
+    config.horizonRoll = Math.min(90, Math.max(-90, roll));
+    renderer.setPose(config.horizonPitch * Math.PI / 180, config.horizonRoll * Math.PI / 180);
+    animateInit();
+    return this;
+};
+
+/**
+ * Returns the panorama's horizon pitch.
+ * @memberof Viewer
+ * @instance
+ * @returns {number} Horizon pitch in degrees
+ */
+this.getHorizonPitch = function() {
+    return config.horizonPitch;
+};
+
+/**
+ * Sets the panorama's horizon pitch.
+ * @memberof Viewer
+ * @instance
+ * @param {number} pitch - Horizon pitch in degrees [-90, 90]
+ * @returns {Viewer} `this`
+ */
+this.setHorizonPitch = function(pitch) {
+    config.horizonPitch = Math.min(90, Math.max(-90, pitch));
+    renderer.setPose(config.horizonPitch * Math.PI / 180, config.horizonRoll * Math.PI / 180);
     animateInit();
     return this;
 };
